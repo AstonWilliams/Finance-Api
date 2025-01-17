@@ -10,7 +10,7 @@ import asyncio
 base_url = "https://finance.yahoo.com/research-hub/screener/mutualfunds?start={start}&count={count}"
 
 desired_columns = [
-    "Symbol", "Name", "1D Chart", "Price (Intraday)", "Change", "Change %",
+    "Symbol", "Name", "Price (Intraday)", "Change", "Change %",
     "Volume", "YTD Return", "3-Mo Return", "1-Year", "3-Year Return", "5-Year Return",
     "Net Expense Ratio", "Gross Expense Ratio", "Net Assets", "Morningstar Rating",
     "50 Day Avg", "200 Day Avg", "52 Week Range"
@@ -33,17 +33,35 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
         
         for row in rows:
             cells = row.xpath(".//td")
-            if len(cells) == len(desired_columns):
-                row_data = {col: cells[i].text_content().strip() for i, col in enumerate(desired_columns)}
+            if len(cells) >= len(desired_columns):
+                row_data = {
+                    "Symbol": cells[0].text_content().strip(),
+                    "Name": cells[1].text_content().strip(),
+                    "Price (Intraday)": cells[2].text_content().strip(),
+                    "Change": cells[3].text_content().strip(),
+                    "Change %": cells[4].text_content().strip(),
+                    "Volume": cells[5].text_content().strip(),
+                    "YTD Return": cells[6].text_content().strip(),
+                    "3-Mo Return": cells[7].text_content().strip(),
+                    "1-Year": cells[8].text_content().strip(),
+                    "3-Year Return": cells[9].text_content().strip(),
+                    "5-Year Return": cells[10].text_content().strip(),
+                    "Net Expense Ratio": cells[11].text_content().strip(),
+                    "Gross Expense Ratio": cells[12].text_content().strip(),
+                    "Net Assets": cells[13].text_content().strip(),
+                    "Morningstar Rating": cells[14].text_content().strip(),
+                    "50 Day Avg": cells[15].text_content().strip(),
+                    "200 Day Avg": cells[16].text_content().strip(),
+                    "52 Week Range": cells[17].text_content().strip()
+                }
                 row_data_hash = generate_hash(row_data)
 
-                # Hashing to remove duplicates
+                # Check for duplicates
                 existing_record = session.query(YahooFinanceData).filter_by(hash=row_data_hash).first()
                 if not existing_record:
                     new_record = YahooFinanceData(
                         symbol=row_data["Symbol"],
                         name=row_data["Name"],
-                        chart=row_data["1D Chart"],
                         price_intraday=row_data["Price (Intraday)"],
                         change=row_data["Change"],
                         change_percent=row_data["Change %"],
@@ -86,8 +104,27 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
         
         for row in rows:
             cells = row.xpath(".//td")
-            if len(cells) == len(desired_columns):
-                row_data = {col: cells[i].text_content().strip() for i, col in enumerate(desired_columns)}
+            if len(cells) >= len(desired_columns):
+                row_data = {
+                    "Symbol": cells[0].text_content().strip(),
+                    "Name": cells[1].text_content().strip(),
+                    "Price (Intraday)": cells[2].text_content().strip(),
+                    "Change": cells[3].text_content().strip(),
+                    "Change %": cells[4].text_content().strip(),
+                    "Volume": cells[5].text_content().strip(),
+                    "YTD Return": cells[6].text_content().strip(),
+                    "3-Mo Return": cells[7].text_content().strip(),
+                    "1-Year": cells[8].text_content().strip(),
+                    "3-Year Return": cells[9].text_content().strip(),
+                    "5-Year Return": cells[10].text_content().strip(),
+                    "Net Expense Ratio": cells[11].text_content().strip(),
+                    "Gross Expense Ratio": cells[12].text_content().strip(),
+                    "Net Assets": cells[13].text_content().strip(),
+                    "Morningstar Rating": cells[14].text_content().strip(),
+                    "50 Day Avg": cells[15].text_content().strip(),
+                    "200 Day Avg": cells[16].text_content().strip(),
+                    "52 Week Range": cells[17].text_content().strip()
+                }
                 data.append(row_data)
     else:
         print(f"Failed to fetch data from Yahoo Finance: {response.status_code}")

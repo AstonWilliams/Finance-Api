@@ -3,17 +3,17 @@ from sqlalchemy.orm import Session
 from app.services.news import get_latest_news
 from app.services.yahoo_finance import fetch_data_from_yahoo_finance, fetch_and_store_data_from_yahoo_finance
 from app.db.database import get_db
-from app.schemas.news import NewsArticle as NewsArticleSchema
+from app.schemas.news import NewsArticle, HTTPValidationError
 from typing import List, Dict
 
 router = APIRouter()
 
-@router.get("/news", response_model=List[NewsArticleSchema])
+@router.get("/news", response_model=List[NewsArticle], responses={422: {"model": HTTPValidationError}})
 def read_news(db: Session = Depends(get_db)):
     news = get_latest_news(db)
     return news
 
-@router.get("/yahoofinance", response_model=List[Dict[str, str]])
+@router.get("/yahoofinance", response_model=List[Dict[str, str]], responses={422: {"model": HTTPValidationError}})
 def read_yahoo_finance_data(
     start: int = 0,
     count: int = 100,
@@ -60,7 +60,8 @@ def read_yahoo_finance_data(
         "200 Day Avg": two_hundred_day_avg,
         "52 Week Range": fifty_two_week_range
     }
-    
+
+    # Filter data based on query parameters
     filtered_data = [
         item for item in data
         if all(
