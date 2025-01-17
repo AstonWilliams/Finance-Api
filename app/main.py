@@ -8,7 +8,7 @@ from app.services.news import continuous_fetch
 from app.services.yahoo_finance import continuous_yahoo_finance_fetch
 import time
 import asyncio
-import json
+import psutil
 
 # Prometheus metrics
 REQUEST_COUNT = Counter("request_count_total", "Total number of requests", ["method", "endpoint"])
@@ -49,12 +49,7 @@ async def add_prometheus_metrics(request: Request, call_next):
 def metrics():
     # Generate metrics data
     metrics_data = generate_latest()
-
-    lines = metrics_data.decode('utf-8').split('\n')
-    lines = [line for line in lines if not line.startswith('#')]
-    cleaned_data = '\n'.join(lines)
-
-    return Response(cleaned_data, media_type=CONTENT_TYPE_LATEST)
+    return Response(metrics_data, media_type=CONTENT_TYPE_LATEST)
 
 @app.get("/metrics_json")
 def metrics_json():
@@ -72,9 +67,11 @@ def metrics_json():
 @app.get("/health")
 def health_check():
     # Extract metric values
-    request_count = sum([sample[2] for sample in REQUEST_COUNT.collect()[0].samples])
-    error_count = sum([sample[2] for sample in ERROR_COUNT.collect()[0].samples])
-    average_latency = sum([sample[2] for sample in REQUEST_LATENCY.collect()[0].samples if sample[1].get('quantile') == '0.5'])
+    request_count = sum(sample.value for sample in REQUEST_COUNT.collect()[0].samples if sample.name == 'request_count_total')
+    error_count = sum(sample.value for sample in ERROR_COUNT.collect()[0].samples if sample.name == 'error_count_total')
+    latency_sum = sum(sample.value for sample in REQUEST_LATENCY.collect()[0].samples if sample.name.endswith('_sum'))
+    latency_count = sum(sample.value for sample in REQUEST_LATENCY.collect()[0].samples if sample.name.endswith('_count'))
+    average_latency = latency_sum / latency_count if latency_count > 0 else 0
 
     # Define thresholds
     max_error_rate = 0.05
@@ -85,10 +82,16 @@ def health_check():
     else:
         status = "healthy"
 
+    cpu_usage = psutil.cpu_percent()
+    memory_usage = psutil.virtual_memory().percent
+
     return JSONResponse(content={
         "status": status,
         "request_count": request_count,
         "error_count": error_count,
         "error_rate": error_rate,
-        "average_latency_seconds": average_latency
+        "average_latency_seconds": average_latency,
+        "cpu_usage_percent": cpu_usage,
+        "memory_usage_percent": memory_usage
     })
+

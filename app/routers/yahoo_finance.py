@@ -4,7 +4,7 @@ from app.services.yahoo_finance import fetch_data_from_yahoo_finance
 
 router = APIRouter()
 
-@router.get("/yahoo-finance", response_model=List[Dict[str, str]])
+@router.get("/yahoofinance", response_model=List[Dict[str, str]])
 def read_yahoo_finance_data(
     symbol: str = Query(None),
     name: str = Query(None),
