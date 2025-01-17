@@ -18,7 +18,7 @@ class NewsArticle(BaseModel):
     content: str
 
     class Config:
-        from_attributes = True  # Updated to reflect Pydantic v2 changes
+        from_attributes = True
 
 class NewsArticleCreate(BaseModel):
     title: str

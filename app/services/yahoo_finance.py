@@ -17,7 +17,7 @@ desired_columns = [
 ]
 
 def generate_hash(data: Dict[str, str]) -> str:
-    hash_data = (data["Symbol"] + data["Name"] + data["Price (Intraday)"]).encode()
+    hash_data = "".join([data[column] for column in desired_columns if column in data]).encode()
     return hashlib.sha256(hash_data).hexdigest()
 
 def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
@@ -29,7 +29,7 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         tree = html.fromstring(response.content)
-        rows = tree.xpath("//tr[contains(@class, 'simpTblRow')]")
+        rows = tree.xpath("//tr[contains(@class, 'row yf-11hlglb')]")
         
         for row in rows:
             cells = row.xpath(".//td")
@@ -100,7 +100,7 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
     data = []
     if response.status_code == 200:
         tree = html.fromstring(response.content)
-        rows = tree.xpath("//tr[contains(@class, 'simpTblRow')]")
+        rows = tree.xpath("//tr[contains(@class, 'row yf-11hlglb')]")
         
         for row in rows:
             cells = row.xpath(".//td")

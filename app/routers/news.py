@@ -38,7 +38,7 @@ def read_yahoo_finance_data(
     fifty_two_week_range: str = Query(None)
 ):
     data = fetch_data_from_yahoo_finance(start=start, count=count)
-    fetch_and_store_data_from_yahoo_finance(start=start, count=count)  # Continuously fetch and store all data
+    fetch_and_store_data_from_yahoo_finance(start=start, count=count)
     query_params = {
         "Symbol": symbol,
         "Name": name,
@@ -61,7 +61,6 @@ def read_yahoo_finance_data(
         "52 Week Range": fifty_two_week_range
     }
 
-    # Filter data based on query parameters
     filtered_data = [
         item for item in data
         if all(
