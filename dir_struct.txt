@@ -1,0 +1,25 @@
+stock-news-api/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── news.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── news.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   └── news.py
+│   ├── routers/
+│   │   ├── __init__.py
+│   │   └── news.py
+│   └── db/
+│       ├── __init__.py
+│       └── database.py
+├── tests/
+│   ├── __init__.py
+│   └── test_news.py
+├── venv/
+├── requirements.txt
+└── README.md
