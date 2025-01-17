@@ -87,9 +87,10 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
     session.close()
 
 async def continuous_yahoo_finance_fetch():
+    start = 0
     while True:
-        fetch_and_store_data_from_yahoo_finance(start=0, count=100)
-        start = start + 100
+        fetch_and_store_data_from_yahoo_finance(start=start, count=100)
+        start += 100
         await asyncio.sleep(20)  # Fetch data every 20 seconds
 
 def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
