@@ -66,16 +66,14 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
         response = requests.get(url)
         if response.status_code == 200:
             tree = etree.HTML(response.content)
-            rows = tree.xpath("//tr[contains(@class, 'simpTblRow')]")
+            rows = tree.xpath("//tr[contains(@class, 'row yf-11hlglb')]")
             for row in rows:
                 data.append({
                     "Symbol": row.xpath(".//td[@aria-label='Symbol']/text()")[0].strip(),
                     "Name": row.xpath(".//td[@aria-label='Fund Name']//a/text()")[0].strip(),
-                    "1D Chart": row.xpath(".//td[@aria-label='1D Chart']/text()")[0].strip(),
-                    "Price (Intraday)": row.xpath(".//td[@aria-label='Price (Intraday)']/text()")[0].strip(),
                     "Change": row.xpath(".//td[@aria-label='Change']/text()")[0].strip(),
                     "Change %": row.xpath(".//td[@aria-label='Change %']/text()")[0].strip(),
-                    "Volume": row.xpath(".//td[@aria-label='Volume']/text()")[0].strip(),
+                    "Price (Intraday)": row.xpath(".//td[@aria-label='Price (Intraday)']/text()")[0].strip(),
                     "YTD Return": row.xpath(".//td[@aria-label='YTD Return']/text()")[0].strip(),
                     "3-Mo Return": row.xpath(".//td[@aria-label='3-Mo Return']/text()")[0].strip(),
                     "1-Year": row.xpath(".//td[@aria-label='1-Year']/text()")[0].strip(),
@@ -84,10 +82,8 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
                     "Net Expense Ratio": row.xpath(".//td[@aria-label='Net Expense Ratio']/text()")[0].strip(),
                     "Gross Expense Ratio": row.xpath(".//td[@aria-label='Gross Expense Ratio']/text()")[0].strip(),
                     "Net Assets": row.xpath(".//td[@aria-label='Net Assets']/text()")[0].strip(),
-                    "Morningstar Rating": row.xpath(".//td[@aria-label='Morningstar Rating']/text()")[0].strip(),
                     "50 Day Avg": row.xpath(".//td[@aria-label='50 Day Avg']/text()")[0].strip(),
-                    "200 Day Avg": row.xpath(".//td[@aria-label='200 Day Avg']/text()")[0].strip(),
-                    "52 Week Range": row.xpath(".//td[@aria-label='52 Week Range']/text()")[0].strip()
+                    "200 Day Avg": row.xpath(".//td[@aria-label='200 Day Avg']/text()")[0].strip()
                 })
         else:
             print(f"Failed to fetch data from Yahoo Finance: {response.status_code}")
@@ -120,7 +116,7 @@ async def continuous_fetch():
             await save_unique_news(db, news_articles)
         await asyncio.sleep(600)  # Fetch data every 10 minutes
 
-def get_latest_news(db: Session, limit: int = 8) -> List[NewsArticle]:
+def get_latest_news(db: Session, limit: int = 30) -> List[NewsArticle]:
     return db.query(NewsArticle).order_by(NewsArticle.published_date.desc()).limit(limit).all()
 
 def get_yahoo_finance_data() -> List[Dict[str, str]]:

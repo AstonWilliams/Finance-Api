@@ -10,8 +10,8 @@ import asyncio
 base_url = "https://finance.yahoo.com/research-hub/screener/mutualfunds?start={start}&count={count}"
 
 desired_columns = [
-    "Symbol", "Name", "Price (Intraday)", "Change", "Change %",
-    "Volume", "YTD Return", "3-Mo Return", "1-Year", "3-Year Return", "5-Year Return",
+    "Symbol", "Name","Change", "Change %","Price (Intraday)",
+    "YTD Return", "3-Mo Return", "1-Year", "3-Year Return", "5-Year Return",
     "Net Expense Ratio", "Gross Expense Ratio", "Net Assets", "Morningstar Rating",
     "50 Day Avg", "200 Day Avg", "52 Week Range"
 ]
@@ -35,12 +35,11 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
             cells = row.xpath(".//td")
             if len(cells) >= len(desired_columns):
                 row_data = {
-                    "Symbol": cells[0].text_content().strip(),
-                    "Name": cells[1].text_content().strip(),
-                    "Price (Intraday)": cells[2].text_content().strip(),
+                    "Symbol": cells[1].text_content().strip(),
+                    "Name": cells[2].text_content().strip(),
                     "Change": cells[3].text_content().strip(),
                     "Change %": cells[4].text_content().strip(),
-                    "Volume": cells[5].text_content().strip(),
+                    "Price (Intraday)": cells[5].text_content().strip(),
                     "YTD Return": cells[6].text_content().strip(),
                     "3-Mo Return": cells[7].text_content().strip(),
                     "1-Year": cells[8].text_content().strip(),
@@ -49,10 +48,8 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                     "Net Expense Ratio": cells[11].text_content().strip(),
                     "Gross Expense Ratio": cells[12].text_content().strip(),
                     "Net Assets": cells[13].text_content().strip(),
-                    "Morningstar Rating": cells[14].text_content().strip(),
-                    "50 Day Avg": cells[15].text_content().strip(),
-                    "200 Day Avg": cells[16].text_content().strip(),
-                    "52 Week Range": cells[17].text_content().strip()
+                    "50 Day Avg": cells[14].text_content().strip(),
+                    "200 Day Avg": cells[15].text_content().strip(),
                 }
                 row_data_hash = generate_hash(row_data)
 
@@ -62,10 +59,9 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                     new_record = YahooFinanceData(
                         symbol=row_data["Symbol"],
                         name=row_data["Name"],
-                        price_intraday=row_data["Price (Intraday)"],
                         change=row_data["Change"],
                         change_percent=row_data["Change %"],
-                        volume=row_data["Volume"],
+                        price_intraday=row_data["Price (Intraday)"],
                         ytd_return=row_data["YTD Return"],
                         three_mo_return=row_data["3-Mo Return"],
                         one_year=row_data["1-Year"],
@@ -74,10 +70,8 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                         net_expense_ratio=row_data["Net Expense Ratio"],
                         gross_expense_ratio=row_data["Gross Expense Ratio"],
                         net_assets=row_data["Net Assets"],
-                        morningstar_rating=row_data["Morningstar Rating"],
                         fifty_day_avg=row_data["50 Day Avg"],
                         two_hundred_day_avg=row_data["200 Day Avg"],
-                        fifty_two_week_range=row_data["52 Week Range"],
                         hash=row_data_hash
                     )
                     session.add(new_record)
@@ -110,22 +104,19 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
                 row_data = {
                     "Symbol": cells[0].text_content().strip(),
                     "Name": cells[1].text_content().strip(),
-                    "Price (Intraday)": cells[2].text_content().strip(),
-                    "Change": cells[3].text_content().strip(),
-                    "Change %": cells[4].text_content().strip(),
-                    "Volume": cells[5].text_content().strip(),
-                    "YTD Return": cells[6].text_content().strip(),
-                    "3-Mo Return": cells[7].text_content().strip(),
-                    "1-Year": cells[8].text_content().strip(),
-                    "3-Year Return": cells[9].text_content().strip(),
-                    "5-Year Return": cells[10].text_content().strip(),
-                    "Net Expense Ratio": cells[11].text_content().strip(),
-                    "Gross Expense Ratio": cells[12].text_content().strip(),
-                    "Net Assets": cells[13].text_content().strip(),
-                    "Morningstar Rating": cells[14].text_content().strip(),
-                    "50 Day Avg": cells[15].text_content().strip(),
-                    "200 Day Avg": cells[16].text_content().strip(),
-                    "52 Week Range": cells[17].text_content().strip()
+                    "Change": cells[2].text_content().strip(),
+                    "Change %": cells[3].text_content().strip(),
+                    "Price (Intraday)": cells[4].text_content().strip(),
+                    "YTD Return": cells[5].text_content().strip(),
+                    "3-Mo Return": cells[6].text_content().strip(),
+                    "1-Year": cells[7].text_content().strip(),
+                    "3-Year Return": cells[8].text_content().strip(),
+                    "5-Year Return": cells[9].text_content().strip(),
+                    "Net Expense Ratio": cells[10].text_content().strip(),
+                    "Gross Expense Ratio": cells[11].text_content().strip(),
+                    "Net Assets": cells[12].text_content().strip(),
+                    "50 Day Avg": cells[13].text_content().strip(),
+                    "200 Day Avg": cells[14].text_content().strip()
                 }
                 data.append(row_data)
     else:
