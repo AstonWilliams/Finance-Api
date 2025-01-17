@@ -48,8 +48,6 @@ def read_yahoo_finance_data(
         "200 Day Avg": two_hundred_day_avg,
         "52 Week Range": fifty_two_week_range
     }
-    
-    # Filter data based on query parameters
     filtered_data = [
         item for item in data
         if all(

@@ -11,7 +11,7 @@ from app.schemas.news import NewsArticleCreate
 from app.db.database import SessionLocal
 
 def generate_hash(article: NewsArticleCreate) -> str:
-    hash_data = article.title.encode()  # Use title for hash calculation
+    hash_data = article.title.encode()
     return hashlib.sha256(hash_data).hexdigest()
 
 def fetch_news_from_prnewswire() -> List[NewsArticleCreate]:
@@ -28,7 +28,7 @@ def fetch_news_from_prnewswire() -> List[NewsArticleCreate]:
             try:
                 published_date = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %z")
             except ValueError:
-                published_date = datetime.now(timezone.utc)  # Fallback to current time if parsing fails
+                published_date = datetime.now(timezone.utc)
             content = item.findtext("description", default="N/A").strip()
             news_articles.append(NewsArticleCreate(title=title, source=source, published_date=published_date, content=content))
     else:
@@ -58,15 +58,15 @@ def fetch_news_from_businesswire() -> List[NewsArticleCreate]:
 
 def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
     if count not in [50, 100]:
-        count = 100  # Default to 100 if an invalid count is provided
+        count = 100
     base_url = "https://finance.yahoo.com/research-hub/screener/mutualfunds?start={start}&count={count}"
     data = []
-    for i in range(0, 500, count):  # Adjust the range as needed
+    for i in range(0, 200, count):
         url = base_url.format(start=i, count=count)
         response = requests.get(url)
         if response.status_code == 200:
             tree = etree.HTML(response.content)
-            rows = tree.xpath("//tr[contains(@class, 'simpTblRow')]")  # Adjust XPath as needed
+            rows = tree.xpath("//tr[contains(@class, 'simpTblRow')]")
             for row in rows:
                 data.append({
                     "Symbol": row.xpath(".//td[@aria-label='Symbol']/text()")[0].strip(),
@@ -113,12 +113,9 @@ async def continuous_fetch():
                 for future in concurrent.futures.as_completed(futures):
                     news_articles.extend(future.result())
 
-            # Sort news articles by published date, latest first
             news_articles.sort(key=lambda x: x.published_date, reverse=True)
-
-            # Save unique articles to the database
             await save_unique_news(db, news_articles)
-        await asyncio.sleep(600)  # Fetch data every 10 minutes
+        await asyncio.sleep(600)
 
 def get_latest_news(db: Session, limit: int = 8) -> List[NewsArticle]:
     return db.query(NewsArticle).order_by(NewsArticle.published_date.desc()).limit(limit).all()

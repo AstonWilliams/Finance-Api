@@ -37,7 +37,7 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                 row_data = {col: cells[i].text_content().strip() for i, col in enumerate(desired_columns)}
                 row_data_hash = generate_hash(row_data)
 
-                # Check for duplicate
+                # Hashing to remove duplicates
                 existing_record = session.query(YahooFinanceData).filter_by(hash=row_data_hash).first()
                 if not existing_record:
                     new_record = YahooFinanceData(

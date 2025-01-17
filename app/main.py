@@ -50,7 +50,6 @@ def metrics():
     # Generate metrics data
     metrics_data = generate_latest()
 
-    # Remove comments
     lines = metrics_data.decode('utf-8').split('\n')
     lines = [line for line in lines if not line.startswith('#')]
     cleaned_data = '\n'.join(lines)
@@ -78,13 +77,9 @@ def health_check():
     average_latency = sum([sample[2] for sample in REQUEST_LATENCY.collect()[0].samples if sample[1].get('quantile') == '0.5'])
 
     # Define thresholds
-    max_error_rate = 0.05  # 5% errors
-    max_average_latency = 1.0  # 1 second
-
-    # Calculate error rate
+    max_error_rate = 0.05
+    max_average_latency = 1.0
     error_rate = error_count / request_count if request_count else 0
-
-    # Determine health status
     if error_rate > max_error_rate or average_latency > max_average_latency:
         status = "unhealthy"
     else:
