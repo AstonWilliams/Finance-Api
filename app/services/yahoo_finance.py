@@ -102,21 +102,21 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
             cells = row.xpath(".//td")
             if len(cells) >= len(desired_columns):
                 row_data = {
-                    "Symbol": cells[0].text_content().strip(),
-                    "Name": cells[1].text_content().strip(),
-                    "Change": cells[2].text_content().strip(),
-                    "Change %": cells[3].text_content().strip(),
-                    "Price (Intraday)": cells[4].text_content().strip(),
-                    "YTD Return": cells[5].text_content().strip(),
-                    "3-Mo Return": cells[6].text_content().strip(),
-                    "1-Year": cells[7].text_content().strip(),
-                    "3-Year Return": cells[8].text_content().strip(),
-                    "5-Year Return": cells[9].text_content().strip(),
-                    "Net Expense Ratio": cells[10].text_content().strip(),
-                    "Gross Expense Ratio": cells[11].text_content().strip(),
-                    "Net Assets": cells[12].text_content().strip(),
-                    "50 Day Avg": cells[13].text_content().strip(),
-                    "200 Day Avg": cells[14].text_content().strip()
+                    "Symbol": cells[1].text_content().strip(),
+                    "Name": cells[2].text_content().strip(),
+                    "Change": cells[3].text_content().strip(),
+                    "Change %": cells[4].text_content().strip(),
+                    "Price (Intraday)": cells[5].text_content().strip(),
+                    "YTD Return": cells[6].text_content().strip(),
+                    "3-Mo Return": cells[7].text_content().strip(),
+                    "1-Year": cells[8].text_content().strip(),
+                    "3-Year Return": cells[9].text_content().strip(),
+                    "5-Year Return": cells[10].text_content().strip(),
+                    "Net Expense Ratio": cells[11].text_content().strip(),
+                    "Gross Expense Ratio": cells[12].text_content().strip(),
+                    "Net Assets": cells[13].text_content().strip(),
+                    "50 Day Avg": cells[14].text_content().strip(),
+                    "200 Day Avg": cells[15].text_content().strip()
                 }
                 data.append(row_data)
     else:
