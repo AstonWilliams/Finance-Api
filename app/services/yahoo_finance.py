@@ -6,11 +6,12 @@ from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.models.news import YahooFinanceData
 import asyncio
+import datetime
 
 base_url = "https://finance.yahoo.com/research-hub/screener/mutualfunds?start={start}&count={count}"
 
 desired_columns = [
-    "Symbol", "Name","Change", "Change %","Price (Intraday)",
+    "Symbol", "Name", "Change", "Change %", "Price (Intraday)",
     "YTD Return", "3-Mo Return", "1-Year", "3-Year Return", "5-Year Return",
     "Net Expense Ratio", "Gross Expense Ratio", "Net Assets", "Morningstar Rating",
     "50 Day Avg", "200 Day Avg", "52 Week Range"
@@ -50,6 +51,7 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                     "Net Assets": cells[13].text_content().strip(),
                     "50 Day Avg": cells[15].text_content().strip(),
                     "200 Day Avg": cells[16].text_content().strip(),
+                    "timestamp": datetime.datetime.utcnow()
                 }
                 row_data_hash = generate_hash(row_data)
 
@@ -72,6 +74,7 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                         net_assets=row_data["Net Assets"],
                         fifty_day_avg=row_data["50 Day Avg"],
                         two_hundred_day_avg=row_data["200 Day Avg"],
+                        timestamp=row_data["timestamp"],
                         hash=row_data_hash
                     )
                     session.add(new_record)
@@ -116,7 +119,8 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
                     "Gross Expense Ratio": cells[12].text_content().strip(),
                     "Net Assets": cells[13].text_content().strip(),
                     "50 Day Avg": cells[15].text_content().strip(),
-                    "200 Day Avg": cells[16].text_content().strip()
+                    "200 Day Avg": cells[16].text_content().strip(),
+                    "timestamp": datetime.datetime.utcnow()
                 }
                 data.append(row_data)
     else:
