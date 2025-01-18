@@ -48,8 +48,8 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                     "Net Expense Ratio": cells[11].text_content().strip(),
                     "Gross Expense Ratio": cells[12].text_content().strip(),
                     "Net Assets": cells[13].text_content().strip(),
-                    "50 Day Avg": cells[14].text_content().strip(),
-                    "200 Day Avg": cells[15].text_content().strip(),
+                    "50 Day Avg": cells[15].text_content().strip(),
+                    "200 Day Avg": cells[16].text_content().strip(),
                 }
                 row_data_hash = generate_hash(row_data)
 
@@ -115,8 +115,8 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
                     "Net Expense Ratio": cells[11].text_content().strip(),
                     "Gross Expense Ratio": cells[12].text_content().strip(),
                     "Net Assets": cells[13].text_content().strip(),
-                    "50 Day Avg": cells[14].text_content().strip(),
-                    "200 Day Avg": cells[15].text_content().strip()
+                    "50 Day Avg": cells[15].text_content().strip(),
+                    "200 Day Avg": cells[16].text_content().strip()
                 }
                 data.append(row_data)
     else:
