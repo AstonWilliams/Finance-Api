@@ -1,4 +1,3 @@
-import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from app.db.database import Base
 
@@ -32,4 +31,3 @@ class YahooFinanceData(Base):
     fifty_day_avg = Column(String, nullable=True)
     two_hundred_day_avg = Column(String, nullable=True)
     hash = Column(String, unique=True, index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)

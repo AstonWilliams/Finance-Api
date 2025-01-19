@@ -1,6 +1,7 @@
 import sys
 import os
 
+#  locust -f locustfile.py --host=http://localhost:8000
 # Append the project root directory to sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
 

@@ -20,7 +20,7 @@ def read_yahoo_finance_data(
     five_year_return: Optional[str] = Query(None),
     net_expense_ratio: Optional[str] = Query(None),
     gross_expense_ratio: Optional[str] = Query(None),
-    net_assets_greater_than: Optional[float] = Query(None),
+    net_assets: Optional[str] = Query(None),
     fifty_day_avg: Optional[str] = Query(None),
     two_hundred_day_avg: Optional[str] = Query(None),
     sort_by: Optional[str] = Query(None),
@@ -53,8 +53,8 @@ def read_yahoo_finance_data(
         query = query.filter(YahooFinanceData.net_expense_ratio == net_expense_ratio)
     if gross_expense_ratio:
         query = query.filter(YahooFinanceData.gross_expense_ratio == gross_expense_ratio)
-    if net_assets_greater_than:
-        query = query.filter(YahooFinanceData.net_assets > net_assets_greater_than)
+    if net_assets:
+        query = query.filter(YahooFinanceData.net_assets == net_assets)
     if fifty_day_avg:
         query = query.filter(YahooFinanceData.fifty_day_avg == fifty_day_avg)
     if two_hundred_day_avg:
