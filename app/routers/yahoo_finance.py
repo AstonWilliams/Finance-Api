@@ -7,7 +7,7 @@ from app.models.news import YahooFinanceData
 router = APIRouter()
 
 @router.get("/yahoofinance", response_model=List[Dict[str, str]])
-def read_yahoo_finance_data(
+async def read_yahoo_finance_data(
     symbol: Optional[str] = Query(None),
     name: Optional[str] = Query(None),
     change: Optional[str] = Query(None),
@@ -88,7 +88,8 @@ def read_yahoo_finance_data(
             "Net Assets": record.net_assets,
             "Morningstar Rating": record.morningstar_rating,
             "50 Day Avg": record.fifty_day_avg,
-            "200 Day Avg": record.two_hundred_day_avg
+            "200 Day Avg": record.two_hundred_day_avg,
+            "timestamp": record.timestamp.isoformat()  # Ensure timestamp is a string
         }
     for record in result]
 

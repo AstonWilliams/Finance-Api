@@ -1,0 +1,11 @@
+fastapi
+prometheus-client
+SQLAlchemy
+cryptography
+lxml
+BeautifulSoup4
+requests
+psutil
+pytest
+locust
+aioredis

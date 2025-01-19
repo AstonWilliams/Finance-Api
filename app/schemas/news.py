@@ -18,7 +18,7 @@ class NewsArticle(BaseModel):
     content: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True  # Ensure orm_mode is set to True to allow ORM objects
 
 class NewsArticleCreate(BaseModel):
     title: str

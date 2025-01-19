@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from contextlib import asynccontextmanager
-from app.routers import news
+from app.routers import news, yahoo_finance
 from app.db.database import Base, engine
 from app.services.news import continuous_fetch
 from app.services.yahoo_finance import continuous_yahoo_finance_fetch
@@ -30,6 +30,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(news.router)
+app.include_router(yahoo_finance.router)
 
 @app.middleware("http")
 async def add_prometheus_metrics(request: Request, call_next):
@@ -94,4 +95,3 @@ def health_check():
         "cpu_usage_percent": cpu_usage,
         "memory_usage_percent": memory_usage
     })
-

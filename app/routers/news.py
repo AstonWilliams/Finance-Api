@@ -9,12 +9,12 @@ from typing import List, Dict
 router = APIRouter()
 
 @router.get("/news", response_model=List[NewsArticle], responses={422: {"model": HTTPValidationError}})
-def read_news(db: Session = Depends(get_db)):
+async def read_news(db: Session = Depends(get_db)):
     news = get_latest_news(db)
     return news
 
 @router.get("/yahoofinance", response_model=List[Dict[str, str]], responses={422: {"model": HTTPValidationError}})
-def read_yahoo_finance_data(
+async def read_yahoo_finance_data(
     start: int = 0,
     count: int = 100,
     symbol: str = Query(None),
