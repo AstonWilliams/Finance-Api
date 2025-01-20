@@ -5,12 +5,13 @@ from lxml import html
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.models.news import YahooFinanceData
+import datetime  # Import datetime module
 import asyncio
 
 base_url = "https://finance.yahoo.com/research-hub/screener/mutualfunds?start={start}&count={count}"
 
 desired_columns = [
-    "Symbol", "Name","Change", "Change %","Price (Intraday)",
+    "Symbol", "Name", "Change", "Change %", "Price (Intraday)",
     "YTD Return", "3-Mo Return", "1-Year", "3-Year Return", "5-Year Return",
     "Net Expense Ratio", "Gross Expense Ratio", "Net Assets", "Morningstar Rating",
     "50 Day Avg", "200 Day Avg", "52 Week Range"
@@ -34,6 +35,7 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
         for row in rows:
             cells = row.xpath(".//td")
             if len(cells) >= len(desired_columns):
+                timestamp = datetime.datetime.now(datetime.timezone.utc)
                 row_data = {
                     "Symbol": cells[1].text_content().strip(),
                     "Name": cells[2].text_content().strip(),
@@ -50,6 +52,11 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                     "Net Assets": cells[13].text_content().strip(),
                     "50 Day Avg": cells[15].text_content().strip(),
                     "200 Day Avg": cells[16].text_content().strip(),
+                    "timestamp": timestamp.isoformat(),  # Store timestamp as string
+                    "year": timestamp.year,
+                    "month": timestamp.month,
+                    "day": timestamp.day,
+                    "time": timestamp.strftime('%H:%M:%S')  # Store time as string in format hrs:min:sec
                 }
                 row_data_hash = generate_hash(row_data)
 
@@ -72,6 +79,11 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
                         net_assets=row_data["Net Assets"],
                         fifty_day_avg=row_data["50 Day Avg"],
                         two_hundred_day_avg=row_data["200 Day Avg"],
+                        timestamp=row_data["timestamp"],
+                        year=row_data["year"],
+                        month=row_data["month"],
+                        day=row_data["day"],
+                        time=row_data["time"],  # Store time as string in format hrs:min:sec
                         hash=row_data_hash
                     )
                     session.add(new_record)
@@ -81,11 +93,11 @@ def fetch_and_store_data_from_yahoo_finance(start=0, count=100):
     session.close()
 
 async def continuous_yahoo_finance_fetch():
-    start = 0
+    start = 0  # Initialize start variable
     while True:
         fetch_and_store_data_from_yahoo_finance(start=start, count=100)
-        start += 100
-        await asyncio.sleep(200)  # Fetch data every 20 seconds
+        await asyncio.sleep(20)  # Fetch data every 20 seconds
+        start += 100  # Increment start by 100 for the next page
 
 def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
     url = base_url.format(start=start, count=count)
@@ -97,10 +109,10 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
     if response.status_code == 200:
         tree = html.fromstring(response.content)
         rows = tree.xpath("//tr[contains(@class, 'row yf-11hlglb')]")
-        
         for row in rows:
             cells = row.xpath(".//td")
             if len(cells) >= len(desired_columns):
+                timestamp = datetime.datetime.now(datetime.timezone.utc)
                 row_data = {
                     "Symbol": cells[1].text_content().strip(),
                     "Name": cells[2].text_content().strip(),
@@ -116,7 +128,12 @@ def fetch_data_from_yahoo_finance(start=0, count=100) -> List[Dict[str, str]]:
                     "Gross Expense Ratio": cells[12].text_content().strip(),
                     "Net Assets": cells[13].text_content().strip(),
                     "50 Day Avg": cells[15].text_content().strip(),
-                    "200 Day Avg": cells[16].text_content().strip()
+                    "200 Day Avg": cells[16].text_content().strip(),
+                    "timestamp": timestamp.isoformat(),  # Store timestamp as string
+                    "year": str(timestamp.year),
+                    "month": str(timestamp.month),
+                    "day": str(timestamp.day),
+                    "time": timestamp.strftime('%H:%M:%S')  # Store time as string in format hrs:min:sec
                 }
                 data.append(row_data)
     else:

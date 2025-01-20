@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from app.db.database import Base
+import datetime  # Import datetime module
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
@@ -31,3 +32,8 @@ class YahooFinanceData(Base):
     fifty_day_avg = Column(String, nullable=True)
     two_hundred_day_avg = Column(String, nullable=True)
     hash = Column(String, unique=True, index=True)
+    timestamp = Column(String, index=True)  # Store timestamp as VARCHAR
+    year = Column(String, index=True)  # Change to String
+    month = Column(String, index=True)  # Change to String
+    day = Column(String, index=True)  # Change to String
+    time = Column(String, index=True)  # Change to String

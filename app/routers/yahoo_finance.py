@@ -23,6 +23,10 @@ async def read_yahoo_finance_data(
     net_assets: Optional[str] = Query(None),
     fifty_day_avg: Optional[str] = Query(None),
     two_hundred_day_avg: Optional[str] = Query(None),
+    year: Optional[int] = Query(None),
+    month: Optional[int] = Query(None),
+    day: Optional[int] = Query(None),
+    time: Optional[str] = Query(None),
     sort_by: Optional[str] = Query(None),
     sort_order: Optional[str] = Query("asc")
 ):
@@ -30,35 +34,43 @@ async def read_yahoo_finance_data(
     query = session.query(YahooFinanceData)
     
     if symbol:
-        query = query.filter(YahooFinanceData.symbol == symbol)
+        query = query.filter(YahooFinanceData.symbol.ilike(f'%{symbol}%'))
     if name:
-        query = query.filter(YahooFinanceData.name == name)
+        query = query.filter(YahooFinanceData.name.ilike(f'%{name}%'))
     if change:
-        query = query.filter(YahooFinanceData.change == change)
+        query = query.filter(YahooFinanceData.change.ilike(f'%{change}%'))
     if change_percent:
-        query = query.filter(YahooFinanceData.change_percent == change_percent)
+        query = query.filter(YahooFinanceData.change_percent.ilike(f'%{change_percent}%'))
     if price:
-        query = query.filter(YahooFinanceData.price_intraday == price)
+        query = query.filter(YahooFinanceData.price_intraday.ilike(f'%{price}%'))
     if ytd_return:
-        query = query.filter(YahooFinanceData.ytd_return == ytd_return)
+        query = query.filter(YahooFinanceData.ytd_return.ilike(f'%{ytd_return}%'))
     if three_mo_return:
-        query = query.filter(YahooFinanceData.three_mo_return == three_mo_return)
+        query = query.filter(YahooFinanceData.three_mo_return.ilike(f'%{three_mo_return}%'))
     if one_year:
-        query = query.filter(YahooFinanceData.one_year == one_year)
+        query = query.filter(YahooFinanceData.one_year.ilike(f'%{one_year}%'))
     if three_year_return:
-        query = query.filter(YahooFinanceData.three_year_return == three_year_return)
+        query = query.filter(YahooFinanceData.three_year_return.ilike(f'%{three_year_return}%'))
     if five_year_return:
-        query = query.filter(YahooFinanceData.five_year_return == five_year_return)
+        query = query.filter(YahooFinanceData.five_year_return.ilike(f'%{five_year_return}%'))
     if net_expense_ratio:
-        query = query.filter(YahooFinanceData.net_expense_ratio == net_expense_ratio)
+        query = query.filter(YahooFinanceData.net_expense_ratio.ilike(f'%{net_expense_ratio}%'))
     if gross_expense_ratio:
-        query = query.filter(YahooFinanceData.gross_expense_ratio == gross_expense_ratio)
+        query = query.filter(YahooFinanceData.gross_expense_ratio.ilike(f'%{gross_expense_ratio}%'))
     if net_assets:
-        query = query.filter(YahooFinanceData.net_assets == net_assets)
+        query = query.filter(YahooFinanceData.net_assets.ilike(f'%{net_assets}%'))
     if fifty_day_avg:
-        query = query.filter(YahooFinanceData.fifty_day_avg == fifty_day_avg)
+        query = query.filter(YahooFinanceData.fifty_day_avg.ilike(f'%{fifty_day_avg}%'))
     if two_hundred_day_avg:
-        query = query.filter(YahooFinanceData.two_hundred_day_avg == two_hundred_day_avg)
+        query = query.filter(YahooFinanceData.two_hundred_day_avg.ilike(f'%{two_hundred_day_avg}%'))
+    if year:
+        query = query.filter(YahooFinanceData.year == year)
+    if month:
+        query = query.filter(YahooFinanceData.month == month)
+    if day:
+        query = query.filter(YahooFinanceData.day == day)
+    if time:
+        query = query.filter(YahooFinanceData.time.ilike(f'%{time}%'))
 
     if sort_by:
         if sort_order == "desc":
@@ -89,7 +101,11 @@ async def read_yahoo_finance_data(
             "Morningstar Rating": record.morningstar_rating,
             "50 Day Avg": record.fifty_day_avg,
             "200 Day Avg": record.two_hundred_day_avg,
-            "timestamp": record.timestamp.isoformat()  # Ensure timestamp is a string
+            "timestamp": record.timestamp,
+            "year": record.year,
+            "month": record.month,
+            "day": record.day,
+            "time": record.time
         }
     for record in result]
 

@@ -10,6 +10,9 @@ import time
 import asyncio
 import psutil
 
+# Initialize the application
+app = FastAPI()
+
 # Prometheus metrics
 REQUEST_COUNT = Counter("request_count_total", "Total number of requests", ["method", "endpoint"])
 REQUEST_LATENCY = Histogram("request_latency_seconds", "Request latency in seconds", ["method", "endpoint"])
@@ -23,9 +26,11 @@ async def lifespan(app: FastAPI):
     # Start background tasks
     task_news = asyncio.create_task(continuous_fetch())
     task_yahoo_finance = asyncio.create_task(continuous_yahoo_finance_fetch())
+    task_health_check = asyncio.create_task(continuous_health_check())
     yield
     task_news.cancel()
     task_yahoo_finance.cancel()
+    task_health_check.cancel()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -65,6 +70,16 @@ def metrics_json():
 
     return JSONResponse(content=metrics_dict)
 
+def create_progress_bar(usage_percent, length=20, healthy=True):
+    filled_length = int(length * usage_percent // 100)
+    empty_length = length - filled_length
+    if healthy:
+        bar = "🟩" * filled_length + "⬜" * empty_length  # Green bar for healthy status
+    else:
+        bar = "🟥" * filled_length + "⬜" * empty_length  # Red bar for unhealthy status
+
+    return bar
+
 @app.get("/health")
 def health_check():
     # Extract metric values
@@ -80,11 +95,18 @@ def health_check():
     error_rate = error_count / request_count if request_count else 0
     if error_rate > max_error_rate or average_latency > max_average_latency:
         status = "unhealthy"
+        healthy = False
     else:
         status = "healthy"
+        healthy = True
 
     cpu_usage = psutil.cpu_percent()
     memory_usage = psutil.virtual_memory().percent
+
+    cpu_progress_bar = create_progress_bar(cpu_usage, healthy=healthy)
+    memory_progress_bar = create_progress_bar(memory_usage, healthy=healthy)
+
+    print(f"{status.capitalize()} Status")
 
     return JSONResponse(content={
         "status": status,
@@ -93,5 +115,37 @@ def health_check():
         "error_rate": error_rate,
         "average_latency_seconds": average_latency,
         "cpu_usage_percent": cpu_usage,
-        "memory_usage_percent": memory_usage
+        "memory_usage_percent": memory_usage,
+        "cpu_progress_bar": cpu_progress_bar,
+        "memory_progress_bar": memory_progress_bar
     })
+
+async def continuous_health_check():
+    while True:
+        # Extract metric values
+        request_count = sum(sample.value for sample in REQUEST_COUNT.collect()[0].samples if sample.name == 'request_count_total')
+        error_count = sum(sample.value for sample in ERROR_COUNT.collect()[0].samples if sample.name == 'error_count_total')
+        latency_sum = sum(sample.value for sample in REQUEST_LATENCY.collect()[0].samples if sample.name.endswith('_sum'))
+        latency_count = sum(sample.value for sample in REQUEST_LATENCY.collect()[0].samples if sample.name.endswith('_count'))
+        average_latency = latency_sum / latency_count if latency_count > 0 else 0
+
+        # Define thresholds
+        max_error_rate = 0.05
+        max_average_latency = 1.0
+        error_rate = error_count / request_count if request_count else 0
+        if error_rate > max_error_rate or average_latency > max_average_latency:
+            status = "unhealthy"
+            healthy = False
+        else:
+            status = "healthy"
+            healthy = True
+
+        cpu_usage = psutil.cpu_percent()
+        memory_usage = psutil.virtual_memory().percent
+
+        cpu_progress_bar = create_progress_bar(cpu_usage, healthy=healthy)
+        memory_progress_bar = create_progress_bar(memory_usage, healthy=healthy)
+
+        print(f"{status.capitalize()} Status")
+
+        await asyncio.sleep(60)  # Run health check every 60 seconds

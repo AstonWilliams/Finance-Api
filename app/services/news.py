@@ -101,7 +101,7 @@ async def continuous_fetch():
                 await save_unique_news(db, news_articles)
         except Exception as e:
             print(f"Error in continuous_fetch: {e}")
-        await asyncio.sleep(300)  # Fetch data every 10 minutes
+        await asyncio.sleep(3600)  # Fetch data every 10 minutes
 
 def get_latest_news(db: Session, limit: int = 30) -> List[NewsArticle]:
     news_articles = db.query(NewsArticle).order_by(NewsArticle.published_date.desc()).limit(limit).all()
